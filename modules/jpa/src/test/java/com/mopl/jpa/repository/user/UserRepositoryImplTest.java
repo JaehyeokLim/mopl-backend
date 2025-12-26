@@ -4,6 +4,7 @@ import com.mopl.domain.model.user.AuthProvider;
 import com.mopl.domain.model.user.UserModel;
 import com.mopl.domain.repository.user.UserRepository;
 import com.mopl.jpa.config.JpaConfig;
+import com.mopl.jpa.entity.user.UserEntityMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -14,7 +15,11 @@ import org.springframework.context.annotation.Import;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-@Import({JpaConfig.class, UserRepositoryImpl.class})
+@Import({
+    JpaConfig.class,
+    UserRepositoryImpl.class,
+    UserEntityMapper.class
+})
 @DisplayName("UserRepositoryImpl 슬라이스 테스트")
 class UserRepositoryImplTest {
 
@@ -56,7 +61,14 @@ class UserRepositoryImplTest {
         void withExistingEmail_returnsTrue() {
             // given
             String email = "existing@example.com";
-            userRepository.save(UserModel.create(AuthProvider.EMAIL, email, "홍길동", "encodedPassword"));
+            userRepository.save(
+                UserModel.create(
+                    AuthProvider.EMAIL,
+                    email,
+                    "홍길동",
+                    "encodedPassword"
+                )
+            );
 
             // when
             boolean exists = userRepository.existsByEmail(email);

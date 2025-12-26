@@ -3,7 +3,9 @@ package com.mopl.api.interfaces.api.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mopl.api.application.user.UserFacade;
 import com.mopl.api.interfaces.api.ApiControllerAdvice;
+import com.mopl.domain.model.user.AuthProvider;
 import com.mopl.domain.model.user.Role;
+import com.mopl.domain.model.user.UserModel;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -43,6 +45,9 @@ class UserControllerTest {
     @MockBean
     private UserFacade userFacade;
 
+    @MockBean
+    private UserResponseMapper userResponseMapper;
+
     @Nested
     @DisplayName("POST /api/users - 회원가입")
     class SignUpTest {
@@ -51,30 +56,45 @@ class UserControllerTest {
         @DisplayName("유효한 요청 시 201 Created 응답")
         void withValidRequest_returns201Created() throws Exception {
             // given
-            UserCreateRequest request = new UserCreateRequest(
-                "test@example.com",
-                "test",
-                "P@ssw0rd!"
-            );
-
             UUID userId = UUID.randomUUID();
             Instant now = Instant.now();
-            UserDto userDto = new UserDto(
+            String email = "test@example.com";
+            String name = "test";
+            String password = "P@ssw0rd!";
+
+            UserCreateRequest request = new UserCreateRequest(email, name, password);
+
+            UserModel userModel = UserModel.builder()
+                .id(userId)
+                .createdAt(now)
+                .deletedAt(null)
+                .updatedAt(now)
+                .authProvider(AuthProvider.EMAIL)
+                .email(email)
+                .name(name)
+                .password(password)
+                .profileImageUrl(null)
+                .role(Role.USER)
+                .locked(false)
+                .build();
+
+            UserResponse userResponse = new UserResponse(
                 userId,
                 now,
-                "test@example.com",
-                "test",
+                email,
+                name,
                 null,
                 Role.USER,
                 false
             );
 
-            given(userFacade.signUp(any(UserCreateRequest.class))).willReturn(userDto);
+            given(userFacade.signUp(any(UserCreateRequest.class))).willReturn(userModel);
+            given(userResponseMapper.toResponse(userModel)).willReturn(userResponse);
 
             // when & then
             mockMvc.perform(post("/api/users")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(request)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(userId.toString()))
                 .andExpect(jsonPath("$.email").value("test@example.com"))
@@ -118,8 +138,8 @@ class UserControllerTest {
 
             // when & then
             mockMvc.perform(post("/api/users")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(requestBody))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
                 .andExpect(status().isBadRequest());
 
             then(userFacade).should(never()).signUp(any(UserCreateRequest.class));

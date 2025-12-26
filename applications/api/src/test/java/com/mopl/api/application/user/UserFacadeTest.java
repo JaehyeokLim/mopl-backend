@@ -1,7 +1,6 @@
 package com.mopl.api.application.user;
 
 import com.mopl.api.interfaces.api.user.UserCreateRequest;
-import com.mopl.api.interfaces.api.user.UserDto;
 import com.mopl.domain.model.user.AuthProvider;
 import com.mopl.domain.model.user.Role;
 import com.mopl.domain.model.user.UserModel;
@@ -64,14 +63,14 @@ class UserFacadeTest {
             given(userService.create(any(UserModel.class))).willReturn(savedUserModel);
 
             // when
-            UserDto result = userFacade.signUp(request);
+            UserModel result = userFacade.signUp(request);
 
             // then
-            assertThat(result.id()).isEqualTo(userId);
-            assertThat(result.email()).isEqualTo(email);
-            assertThat(result.name()).isEqualTo(name);
-            assertThat(result.role()).isEqualTo(Role.USER);
-            assertThat(result.locked()).isFalse();
+            assertThat(result.getId()).isEqualTo(userId);
+            assertThat(result.getEmail()).isEqualTo(email);
+            assertThat(result.getName()).isEqualTo(name);
+            assertThat(result.getRole()).isEqualTo(Role.USER);
+            assertThat(result.isLocked()).isFalse();
 
             then(userService).should().create(any(UserModel.class));
         }
@@ -107,11 +106,11 @@ class UserFacadeTest {
             given(userService.create(any(UserModel.class))).willReturn(savedUserModel);
 
             // when
-            UserDto result = userFacade.signUp(request);
+            UserModel result = userFacade.signUp(request);
 
             // then
-            assertThat(result.email()).isEqualTo(expectedEmail);
-            assertThat(result.name()).isEqualTo(expectedName);
+            assertThat(result.getEmail()).isEqualTo(expectedEmail);
+            assertThat(result.getName()).isEqualTo(expectedName);
         }
     }
 }

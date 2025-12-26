@@ -1,7 +1,6 @@
 package com.mopl.api.application.user;
 
 import com.mopl.api.interfaces.api.user.UserCreateRequest;
-import com.mopl.api.interfaces.api.user.UserDto;
 import com.mopl.domain.model.user.AuthProvider;
 import com.mopl.domain.model.user.UserModel;
 import com.mopl.domain.service.user.UserService;
@@ -18,7 +17,7 @@ public class UserFacade {
     private final UserService userService;
 
     @Transactional
-    public UserDto signUp(UserCreateRequest userCreateRequest) {
+    public UserModel signUp(UserCreateRequest userCreateRequest) {
         String email = userCreateRequest.email().strip().toLowerCase(Locale.ROOT);
         String name = userCreateRequest.name().strip();
         // password 암호화 로직 추가 필요
@@ -31,8 +30,6 @@ public class UserFacade {
             password
         );
 
-        UserModel savedUserModel = userService.create(userModel);
-
-        return UserDto.from(savedUserModel);
+        return userService.create(userModel);
     }
 }

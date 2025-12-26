@@ -23,7 +23,7 @@ public interface UserApiSpec {
         description = "User가 성공적으로 생성됨",
         content = @Content(
             mediaType = "application/json",
-            schema = @Schema(implementation = UserDto.class)
+            schema = @Schema(implementation = UserResponse.class)
         )
     )
     @ApiResponse(
@@ -50,5 +50,5 @@ public interface UserApiSpec {
             schema = @Schema(implementation = ErrorResponse.class)
         )
     )
-    UserDto signUp(UserCreateRequest request);
+    UserResponse signUp(UserCreateRequest request);
 }
