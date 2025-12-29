@@ -3,12 +3,10 @@ package com.mopl.domain.service.tag;
 import com.mopl.domain.model.tag.TagModel;
 import com.mopl.domain.repository.tag.TagRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
 
-@Service
 @RequiredArgsConstructor
 public class TagService {
 
