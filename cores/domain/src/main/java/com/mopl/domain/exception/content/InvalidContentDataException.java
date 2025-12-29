@@ -4,7 +4,7 @@ import com.mopl.domain.exception.user.UserException;
 
 import java.util.Map;
 
-public class InvalidContentDataException extends UserException {
+public class InvalidContentDataException extends ContentException {
 
     public static final String MESSAGE = "콘텐츠 데이터가 유효하지 않습니다.";
 
