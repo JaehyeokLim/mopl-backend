@@ -1,0 +1,30 @@
+package com.mopl.api.interfaces.api.storage;
+
+import com.mopl.storage.config.LocalStorageProperties;
+import com.mopl.storage.provider.FileStorageProvider;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.Resource;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+@Slf4j
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/v1/files")
+public class FileController {
+
+    private final LocalStorageProperties properties;
+    private final FileStorageProvider fileStorageProvider;
+
+    @GetMapping("/display")
+    public ResponseEntity<Resource> display(@RequestParam String path) {
+        return ResponseEntity.ok()
+            .contentType(MediaType.IMAGE_PNG)
+            .body(fileStorageProvider.load(path));
+    }
+}

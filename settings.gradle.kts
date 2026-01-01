@@ -8,6 +8,7 @@ include(
     ":core:domain",
     ":infrastructure:jpa",
     ":infrastructure:security",
+    ":infrastructure:storage",
     // ":infrastructure:redis",
     // ":infrastructure:kafka",
     // ":infrastructure:external",

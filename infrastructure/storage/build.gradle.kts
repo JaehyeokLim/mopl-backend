@@ -1,0 +1,8 @@
+plugins {
+    `java-library`
+}
+
+dependencies {
+    // validation
+    implementation("org.springframework.boot:spring-boot-starter-validation")
+}

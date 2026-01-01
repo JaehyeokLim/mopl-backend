@@ -3,6 +3,7 @@ dependencies {
     implementation(project(":core:domain"))
     implementation(project(":infrastructure:jpa"))
     implementation(project(":infrastructure:security"))
+    implementation(project(":infrastructure:storage"))
     implementation(project(":shared:jackson"))
 
     // web

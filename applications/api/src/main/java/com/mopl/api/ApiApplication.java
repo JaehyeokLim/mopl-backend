@@ -5,7 +5,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication(scanBasePackages = {
     "com.mopl.api",
-    "com.mopl.jpa"
+    "com.mopl.jpa",
+    "com.mopl.storage"
 })
 public class ApiApplication {
 
