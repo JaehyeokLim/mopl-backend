@@ -30,7 +30,8 @@ public class ContentFacade {
         }
 
         try {
-            String fileName = "contents/" + java.util.UUID.randomUUID() + "_" + thumbnail.getOriginalFilename();
+            String fileName = "contents/" + java.util.UUID.randomUUID() + "_" + thumbnail
+                .getOriginalFilename();
             String storedPath = fileStorageProvider.upload(thumbnail.getInputStream(), fileName);
             String thumbnailUrl = fileStorageProvider.getUrl(storedPath);
 

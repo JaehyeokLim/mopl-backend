@@ -67,9 +67,11 @@ class ContentFacadeTest {
             given(thumbnail.getInputStream()).willReturn(inputStream);
 
             String mockStoredPath = "contents/uuid_inception.png";
-            String mockThumbnailUrl = "http://localhost:8080/api/v1/files/display?path=" + mockStoredPath;
+            String mockThumbnailUrl = "http://localhost:8080/api/v1/files/display?path="
+                + mockStoredPath;
 
-            given(fileStorageProvider.upload(eq(inputStream), anyString())).willReturn(mockStoredPath);
+            given(fileStorageProvider.upload(eq(inputStream), anyString())).willReturn(
+                mockStoredPath);
             given(fileStorageProvider.getUrl(mockStoredPath)).willReturn(mockThumbnailUrl);
 
             Instant now = Instant.now();
@@ -109,7 +111,8 @@ class ContentFacadeTest {
         @DisplayName("파일 스트림 읽기 실패 시 RuntimeException 발생")
         void withInputStreamError_throwsException() throws IOException {
             // given
-            ContentCreateRequest request = new ContentCreateRequest("영화", "인셉션", "꿈속의 꿈", List.of());
+            ContentCreateRequest request = new ContentCreateRequest("영화", "인셉션", "꿈속의 꿈", List
+                .of());
             MultipartFile thumbnail = mock(MultipartFile.class);
 
             given(thumbnail.isEmpty()).willReturn(false);
@@ -125,7 +128,8 @@ class ContentFacadeTest {
         @DisplayName("썸네일이 없으면 예외 발생")
         void withNullThumbnail_throwsException() {
             // given
-            ContentCreateRequest request = new ContentCreateRequest("영화", "인셉션", "꿈속의 꿈", List.of());
+            ContentCreateRequest request = new ContentCreateRequest("영화", "인셉션", "꿈속의 꿈", List
+                .of());
 
             // when & then
             assertThatThrownBy(() -> contentFacade.upload(request, null))
@@ -136,7 +140,8 @@ class ContentFacadeTest {
         @DisplayName("빈 썸네일 파일이면 예외 발생")
         void withEmptyThumbnail_throwsException() {
             // given
-            ContentCreateRequest request = new ContentCreateRequest("영화", "인셉션", "꿈속의 꿈", List.of());
+            ContentCreateRequest request = new ContentCreateRequest("영화", "인셉션", "꿈속의 꿈", List
+                .of());
             MultipartFile emptyFile = mock(MultipartFile.class);
             given(emptyFile.isEmpty()).willReturn(true);
 

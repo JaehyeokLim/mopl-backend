@@ -37,12 +37,14 @@ class LocalFileStorageProviderTest {
     @Nested
     @DisplayName("파일 업로드 테스트")
     class UploadTest {
+
         @Test
         @DisplayName("정상적인 파일과 경로가 주어지면 업로드에 성공한다")
         void upload_Success() {
             // given
             String content = "test content";
-            InputStream inputStream = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
+            InputStream inputStream = new ByteArrayInputStream(content.getBytes(
+                StandardCharsets.UTF_8));
             String relativePath = "sub/test.txt";
 
             // when
@@ -58,6 +60,7 @@ class LocalFileStorageProviderTest {
         void upload_Fail_InvalidStream() throws IOException {
             // given
             InputStream exceptionStream = new InputStream() {
+
                 @Override
                 public int read() throws IOException {
                     throw new IOException("강제 발생 에러");
@@ -74,6 +77,7 @@ class LocalFileStorageProviderTest {
     @Nested
     @DisplayName("파일 로드 테스트")
     class LoadTest {
+
         @Test
         @DisplayName("존재하는 파일을 로드하면 Resource 객체를 반환한다")
         void load_Success() throws IOException {
@@ -104,6 +108,7 @@ class LocalFileStorageProviderTest {
     @Nested
     @DisplayName("URL 생성 및 삭제 테스트")
     class UrlAndDeleteTest {
+
         @Test
         @DisplayName("상대 경로가 주어지면 전체 접근 URL을 생성한다")
         void getUrl_Success() {

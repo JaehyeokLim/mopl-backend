@@ -1,6 +1,5 @@
 package com.mopl.api.config;
 
-import com.mopl.domain.model.user.UserModel;
 import com.mopl.security.config.SecurityRegistry;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
