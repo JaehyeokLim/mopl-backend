@@ -31,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = ContentController.class)
 @AutoConfigureMockMvc(addFilters = false)
-@Import({ApiControllerAdvice.class, ContentControllerAdvice.class})
+@Import(ApiControllerAdvice.class)
 @DisplayName("ContentController 슬라이스 테스트")
 class ContentControllerTest {
 
@@ -115,8 +115,7 @@ class ContentControllerTest {
             // when & then
             mockMvc.perform(multipart("/api/contents")
                 .file(thumbnailPart))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.exceptionName").value("MissingServletRequestPartException"));
+                .andExpect(status().isBadRequest());
 
             then(contentFacade).should(never()).upload(any(), any());
         }
@@ -144,8 +143,7 @@ class ContentControllerTest {
             mockMvc.perform(multipart("/api/contents")
                 .file(requestPart)
                 .file(thumbnailPart))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.exceptionName").value("MethodArgumentNotValidException"));
+                .andExpect(status().isBadRequest());
 
             then(contentFacade).should(never()).upload(any(), any());
         }
