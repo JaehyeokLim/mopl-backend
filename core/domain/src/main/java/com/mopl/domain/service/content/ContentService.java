@@ -20,15 +20,7 @@ public class ContentService {
 
     public ContentModel create(ContentModel content, List<String> tagNames) {
         ContentModel savedContent = contentRepository.save(content);
-
-        // 태그가 있을 때만 처리 (정책 반영)
-        if (tagNames != null && !tagNames.isEmpty()) {
-            List<TagModel> tags = tagService.findOrCreateTags(tagNames);
-            contentTagRepository.saveAll(savedContent.getId(), tags);
-            return savedContent.withTags(toTagNames(tags));
-        }
-
-        return savedContent;
+        return applyTags(savedContent, tagNames);
     }
 
     public boolean exists(UUID contentId) {
@@ -53,26 +45,40 @@ public class ContentService {
     ) {
         ContentModel contentModel = getById(contentId);
 
-        String finalThumbnailUrl = (thumbnailUrl != null) ? thumbnailUrl : contentModel
-            .getThumbnailUrl();
-        ContentModel updatedContent = contentModel.update(title, description, finalThumbnailUrl);
+        String finalThumbnailUrl = (thumbnailUrl != null)
+            ? thumbnailUrl
+            : contentModel.getThumbnailUrl();
+
+        ContentModel updatedContent = contentModel.update(
+            title,
+            description,
+            finalThumbnailUrl
+        );
+
         ContentModel savedContent = contentRepository.save(updatedContent);
 
         contentTagRepository.deleteAllByContentId(savedContent.getId());
 
-        if (tagNames != null && !tagNames.isEmpty()) {
-            List<TagModel> tags = tagService.findOrCreateTags(tagNames);
-            contentTagRepository.saveAll(savedContent.getId(), tags);
-            return savedContent.withTags(toTagNames(tags));
+        return applyTags(savedContent, tagNames);
+    }
+
+    private ContentModel applyTags(ContentModel content, List<String> tagNames) {
+        if (tagNames == null || tagNames.isEmpty()) {
+            return content.withTags(List.of());
         }
 
-        return savedContent.withTags(List.of());
+        List<TagModel> tags = tagService.findOrCreateTags(tagNames);
+        contentTagRepository.saveAll(content.getId(), tags);
+
+        return content.withTags(toTagNames(tags));
     }
 
     private List<String> toTagNames(List<TagModel> tags) {
         if (tags == null) {
             return List.of();
         }
-        return tags.stream().map(TagModel::getName).toList();
+        return tags.stream()
+            .map(TagModel::getName)
+            .toList();
     }
 }
