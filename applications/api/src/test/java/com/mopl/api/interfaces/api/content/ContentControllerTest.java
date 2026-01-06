@@ -53,6 +53,7 @@ class ContentControllerTest {
         @Test
         @DisplayName("유효한 요청 시 201 Created 응답")
         void withValidRequest_returns201Created() throws Exception {
+            // given
             UUID contentId = UUID.randomUUID();
 
             ContentCreateRequest request = new ContentCreateRequest(
@@ -86,10 +87,13 @@ class ContentControllerTest {
             given(contentFacade.upload(any(), any())).willReturn(contentModel);
             given(contentResponseMapper.toResponse(contentModel)).willReturn(response);
 
-            mockMvc.perform(multipart("/api/contents")
-                .file(requestPart)
-                .file(thumbnailPart)
-                .accept(MediaType.APPLICATION_JSON))
+            // when & then
+            mockMvc.perform(
+                multipart("/api/contents")
+                    .file(requestPart)
+                    .file(thumbnailPart)
+                    .accept(MediaType.APPLICATION_JSON)
+            )
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(contentId.toString()));
 
@@ -104,6 +108,7 @@ class ContentControllerTest {
         @Test
         @DisplayName("정상 조회 시 200 OK")
         void withExistingId_returns200() throws Exception {
+            // given
             UUID contentId = UUID.randomUUID();
 
             ContentModel model = ContentModel.builder()
@@ -119,6 +124,7 @@ class ContentControllerTest {
             given(contentFacade.getDetail(contentId)).willReturn(model);
             given(contentResponseMapper.toResponse(model)).willReturn(response);
 
+            // when & then
             mockMvc.perform(get("/api/contents/{id}", contentId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(contentId.toString()));
@@ -132,6 +138,7 @@ class ContentControllerTest {
         @Test
         @DisplayName("썸네일 없이 수정 시 200 OK")
         void updateWithoutThumbnail_returns200() throws Exception {
+            // given
             UUID contentId = UUID.randomUUID();
 
             ContentUpdateRequest request = new ContentUpdateRequest(
@@ -160,6 +167,7 @@ class ContentControllerTest {
             given(contentResponseMapper.toResponse(updatedModel))
                 .willReturn(response);
 
+            // when & then
             mockMvc.perform(
                 multipart("/api/contents/{id}", contentId)
                     .file(requestPart)
@@ -178,6 +186,7 @@ class ContentControllerTest {
         @Test
         @DisplayName("썸네일 포함 수정 시 200 OK")
         void updateWithThumbnail_returns200() throws Exception {
+            // given
             UUID contentId = UUID.randomUUID();
 
             ContentUpdateRequest request = new ContentUpdateRequest(
@@ -213,6 +222,7 @@ class ContentControllerTest {
             given(contentResponseMapper.toResponse(updatedModel))
                 .willReturn(response);
 
+            // when & then
             mockMvc.perform(
                 multipart("/api/contents/{id}", contentId)
                     .file(requestPart)

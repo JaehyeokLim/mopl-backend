@@ -44,6 +44,7 @@ class ContentServiceTest {
         @Test
         @DisplayName("태그명이 있으면 태그 생성 후 연관관계 저장")
         void withTagNames_createsTagsAndRelations() {
+            // given
             UUID contentId = UUID.randomUUID();
             ContentModel contentModel = ContentModel.builder()
                 .id(contentId)
@@ -59,8 +60,10 @@ class ContentServiceTest {
             given(contentRepository.save(contentModel)).willReturn(contentModel);
             given(tagService.findOrCreateTags(tagNames)).willReturn(tags);
 
+            // when
             ContentModel result = contentService.create(contentModel, tagNames);
 
+            // then
             assertThat(result.getTags()).containsExactly("SF", "액션");
             then(contentRepository).should().save(contentModel);
             then(tagService).should().findOrCreateTags(tagNames);
@@ -70,14 +73,17 @@ class ContentServiceTest {
         @Test
         @DisplayName("태그명이 없으면 태그 로직을 타지 않는다")
         void withoutTagNames_onlySaveContent() {
+            // given
             ContentModel contentModel = ContentModel.builder()
                 .title("인셉션")
                 .build();
 
             given(contentRepository.save(contentModel)).willReturn(contentModel);
 
+            // when
             ContentModel result = contentService.create(contentModel, List.of());
 
+            // then
             assertThat(result.getTags()).isEmpty();
             then(tagService).shouldHaveNoInteractions();
             then(contentTagRepository).shouldHaveNoInteractions();
@@ -86,14 +92,17 @@ class ContentServiceTest {
         @Test
         @DisplayName("태그명이 null이면 태그 로직을 타지 않는다")
         void withNullTagNames_onlySaveContent() {
+            // given
             ContentModel contentModel = ContentModel.builder()
                 .title("인셉션")
                 .build();
 
             given(contentRepository.save(contentModel)).willReturn(contentModel);
 
+            // when
             ContentModel result = contentService.create(contentModel, null);
 
+            // then
             assertThat(result.getTags()).isEmpty();
             then(tagService).shouldHaveNoInteractions();
             then(contentTagRepository).shouldHaveNoInteractions();
@@ -107,6 +116,7 @@ class ContentServiceTest {
         @Test
         @DisplayName("콘텐츠와 태그를 함께 조회한다")
         void returnsContentWithTags() {
+            // given
             UUID contentId = UUID.randomUUID();
             ContentModel contentModel = ContentModel.builder()
                 .id(contentId)
@@ -121,17 +131,21 @@ class ContentServiceTest {
             given(contentRepository.findById(contentId)).willReturn(Optional.of(contentModel));
             given(contentTagRepository.findTagsByContentId(contentId)).willReturn(tags);
 
+            // when
             ContentModel result = contentService.getById(contentId);
 
+            // then
             assertThat(result.getTags()).containsExactly("SF", "액션");
         }
 
         @Test
         @DisplayName("존재하지 않으면 예외 발생")
         void notFound_throwsException() {
+            // given
             UUID contentId = UUID.randomUUID();
             given(contentRepository.findById(contentId)).willReturn(Optional.empty());
 
+            // when & then
             assertThatThrownBy(() -> contentService.getById(contentId))
                 .isInstanceOf(ContentNotFoundException.class);
         }
@@ -144,6 +158,7 @@ class ContentServiceTest {
         @Test
         @DisplayName("기존 태그 삭제 후 새 태그로 갱신")
         void update_replacesTags() {
+            // given
             UUID contentId = UUID.randomUUID();
             ContentModel original = ContentModel.builder()
                 .id(contentId)
@@ -161,6 +176,7 @@ class ContentServiceTest {
             given(contentRepository.save(any())).willAnswer(inv -> inv.getArgument(0));
             given(tagService.findOrCreateTags(tagNames)).willReturn(tags);
 
+            // when
             ContentModel result = contentService.update(
                 contentId,
                 "새 제목",
@@ -169,6 +185,7 @@ class ContentServiceTest {
                 tagNames
             );
 
+            // then
             assertThat(result.getTitle()).isEqualTo("새 제목");
             assertThat(result.getTags()).containsExactly("드라마");
 
@@ -183,18 +200,28 @@ class ContentServiceTest {
 
         @Test
         void exists_returnsTrue() {
+            // given
             UUID id = UUID.randomUUID();
             given(contentRepository.existsById(id)).willReturn(true);
 
-            assertThat(contentService.exists(id)).isTrue();
+            // when
+            boolean result = contentService.exists(id);
+
+            // then
+            assertThat(result).isTrue();
         }
 
         @Test
         void notExists_returnsFalse() {
+            // given
             UUID id = UUID.randomUUID();
             given(contentRepository.existsById(id)).willReturn(false);
 
-            assertThat(contentService.exists(id)).isFalse();
+            // when
+            boolean result = contentService.exists(id);
+
+            // then
+            assertThat(result).isFalse();
         }
     }
 }
