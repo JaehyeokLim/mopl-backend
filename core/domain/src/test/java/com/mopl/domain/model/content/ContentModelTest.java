@@ -11,9 +11,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static com.mopl.domain.model.content.ContentModel.THUMBNAIL_URL_MAX_LENGTH;
-import static com.mopl.domain.model.content.ContentModel.TITLE_MAX_LENGTH;
-import static com.mopl.domain.model.content.ContentModel.TYPE_MAX_LENGTH;
+import static com.mopl.domain.model.content.ContentModel.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -52,43 +50,31 @@ class ContentModelTest {
             assertThat(content.getTags()).isEmpty();
         }
 
-        @Test
-        @DisplayName("description은 null이어도 생성 가능")
-        void create_withNullDescription() {
-            // given
-            String type = "영화";
-            String title = "제목";
-            String thumbnailUrl = "url";
-
-            // when
-            ContentModel content = ContentModel.create(type, title, null, thumbnailUrl);
-
-            // then
-            assertThat(content.getDescription()).isNull();
-        }
-
         @ParameterizedTest
         @MethodSource("com.mopl.domain.model.content.ContentModelTest#emptyFieldsProvider")
         @DisplayName("타입이 비어있으면 예외 발생")
         void create_withEmptyType(String desc, String type) {
-            // given
-
-            // when & then
-            assertThatThrownBy(() -> ContentModel.create(
-                type, "제목", "설명", "url"
-            )).isInstanceOf(InvalidContentDataException.class);
+            // given / when / then
+            assertThatThrownBy(() -> ContentModel.create(type, "제목", "설명", "url")
+            ).isInstanceOf(InvalidContentDataException.class);
         }
 
         @ParameterizedTest
         @MethodSource("com.mopl.domain.model.content.ContentModelTest#emptyFieldsProvider")
         @DisplayName("제목이 비어있으면 예외 발생")
         void create_withEmptyTitle(String desc, String title) {
-            // given
+            // given / when / then
+            assertThatThrownBy(() -> ContentModel.create("TYPE", title, "설명", "url")
+            ).isInstanceOf(InvalidContentDataException.class);
+        }
 
-            // when & then
-            assertThatThrownBy(() -> ContentModel.create(
-                "TYPE", title, "설명", "url"
-            )).isInstanceOf(InvalidContentDataException.class);
+        @ParameterizedTest
+        @MethodSource("com.mopl.domain.model.content.ContentModelTest#emptyFieldsProvider")
+        @DisplayName("설명이 비어있으면 예외 발생")
+        void create_withEmptyDescription(String desc, String description) {
+            // given / when / then
+            assertThatThrownBy(() -> ContentModel.create("TYPE", "제목", description, "url")
+            ).isInstanceOf(InvalidContentDataException.class);
         }
 
         @Test
@@ -97,10 +83,9 @@ class ContentModelTest {
             // given
             String longType = "a".repeat(TYPE_MAX_LENGTH + 1);
 
-            // when & then
-            assertThatThrownBy(() -> ContentModel.create(
-                longType, "제목", "설명", "url"
-            )).isInstanceOf(InvalidContentDataException.class);
+            // when / then
+            assertThatThrownBy(() -> ContentModel.create(longType, "제목", "설명", "url")
+            ).isInstanceOf(InvalidContentDataException.class);
         }
 
         @Test
@@ -109,10 +94,9 @@ class ContentModelTest {
             // given
             String longTitle = "a".repeat(TITLE_MAX_LENGTH + 1);
 
-            // when & then
-            assertThatThrownBy(() -> ContentModel.create(
-                "TYPE", longTitle, "설명", "url"
-            )).isInstanceOf(InvalidContentDataException.class);
+            // when / then
+            assertThatThrownBy(() -> ContentModel.create("TYPE", longTitle, "설명", "url")
+            ).isInstanceOf(InvalidContentDataException.class);
         }
 
         @Test
@@ -121,10 +105,9 @@ class ContentModelTest {
             // given
             String longUrl = "a".repeat(THUMBNAIL_URL_MAX_LENGTH + 1);
 
-            // when & then
-            assertThatThrownBy(() -> ContentModel.create(
-                "TYPE", "제목", "설명", longUrl
-            )).isInstanceOf(InvalidContentDataException.class);
+            // when / then
+            assertThatThrownBy(() -> ContentModel.create("TYPE", "제목", "설명", longUrl)
+            ).isInstanceOf(InvalidContentDataException.class);
         }
     }
 
@@ -162,10 +145,23 @@ class ContentModelTest {
                 "영화", "제목", "설명", "url"
             );
 
-            // when & then
-            assertThatThrownBy(() -> original.update(
-                title, "설명", "url"
-            )).isInstanceOf(InvalidContentDataException.class);
+            // when / then
+            assertThatThrownBy(() -> original.update(title, "설명", "url")
+            ).isInstanceOf(InvalidContentDataException.class);
+        }
+
+        @ParameterizedTest
+        @MethodSource("com.mopl.domain.model.content.ContentModelTest#emptyFieldsProvider")
+        @DisplayName("update 시 설명이 비어있으면 예외 발생")
+        void update_withEmptyDescription(String desc, String description) {
+            // given
+            ContentModel original = ContentModel.create(
+                "영화", "제목", "설명", "url"
+            );
+
+            // when / then
+            assertThatThrownBy(() -> original.update("제목", description, "url")
+            ).isInstanceOf(InvalidContentDataException.class);
         }
 
         @Test
@@ -177,10 +173,9 @@ class ContentModelTest {
             );
             String longUrl = "a".repeat(THUMBNAIL_URL_MAX_LENGTH + 1);
 
-            // when & then
-            assertThatThrownBy(() -> original.update(
-                "제목", "설명", longUrl
-            )).isInstanceOf(InvalidContentDataException.class);
+            // when / then
+            assertThatThrownBy(() -> original.update("제목", "설명", longUrl)
+            ).isInstanceOf(InvalidContentDataException.class);
         }
     }
 
@@ -213,8 +208,6 @@ class ContentModelTest {
         @Test
         @DisplayName("빌더로 태그 포함 생성 가능")
         void builder_withTags() {
-            // given
-
             // when
             ContentModel content = ContentModel.builder()
                 .type("영화")
@@ -231,8 +224,6 @@ class ContentModelTest {
         @Test
         @DisplayName("빌더는 유효성 검증을 우회한다")
         void builder_allowsInvalidState() {
-            // given
-
             // when
             ContentModel content = ContentModel.builder()
                 .type("")
