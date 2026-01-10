@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,7 +41,7 @@ public class PlaylistController {
 
     @PatchMapping("/{playlistId}")
     @ResponseStatus(HttpStatus.OK)
-    public PlaylistResponse updatePlayList(
+    public PlaylistResponse updatePlaylist(
         @AuthenticationPrincipal MoplUserDetails userDetails,
         @PathVariable UUID playlistId,
         @RequestBody @Valid PlaylistUpdateRequest request
@@ -52,6 +53,17 @@ public class PlaylistController {
             playlistId,
             request
         );
+    }
+
+    @DeleteMapping("/{playlistId}")
+    @ResponseStatus(HttpStatus.OK)
+    public void deletePlaylist(
+        @AuthenticationPrincipal MoplUserDetails userDetails,
+        @PathVariable UUID playlistId
+    ) {
+        UUID requesterId = userDetails.userId();
+
+        playlistFacade.deletePlaylist(requesterId, playlistId);
     }
 
 }
