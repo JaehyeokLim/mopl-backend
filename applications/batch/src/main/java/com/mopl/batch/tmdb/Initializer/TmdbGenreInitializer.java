@@ -1,6 +1,6 @@
-package com.mopl.batch.Initializer;
+package com.mopl.batch.tmdb.Initializer;
 
-import com.mopl.batch.service.TmdbGenreSyncService;
+import com.mopl.batch.tmdb.service.TmdbGenreSyncService;
 import com.mopl.domain.repository.tag.GenreRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

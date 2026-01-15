@@ -1,9 +1,9 @@
-package com.mopl.external.client;
+package com.mopl.external.tmdb.client;
 
-import com.mopl.external.model.TmdbGenreResponse;
-import com.mopl.external.model.TmdbMovieResponse;
-import com.mopl.external.model.TmdbTvResponse;
-import com.mopl.external.properteis.TmdbProperties;
+import com.mopl.external.tmdb.model.TmdbGenreResponse;
+import com.mopl.external.tmdb.model.TmdbMovieResponse;
+import com.mopl.external.tmdb.model.TmdbTvResponse;
+import com.mopl.external.tmdb.properteis.TmdbProperties;
 import java.io.IOException;
 import java.io.InputStream;
 import org.springframework.beans.factory.annotation.Qualifier;

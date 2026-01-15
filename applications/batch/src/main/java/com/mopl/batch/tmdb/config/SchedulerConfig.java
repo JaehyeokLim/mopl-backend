@@ -1,4 +1,4 @@
-package com.mopl.batch.config;
+package com.mopl.batch.tmdb.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

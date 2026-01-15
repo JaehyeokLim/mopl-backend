@@ -1,13 +1,13 @@
-package com.mopl.batch.service;
+package com.mopl.batch.tmdb.service;
 
 import com.mopl.domain.model.content.ContentExternalProvider;
 import com.mopl.domain.model.content.ContentModel;
 import com.mopl.domain.model.content.ContentModel.ContentType;
 import com.mopl.domain.repository.content.ContentExternalMappingRepository;
 import com.mopl.domain.service.content.ContentService;
-import com.mopl.external.client.TmdbClient;
-import com.mopl.external.model.TmdbMovieItem;
-import com.mopl.external.model.TmdbTvItem;
+import com.mopl.external.tmdb.client.TmdbClient;
+import com.mopl.external.tmdb.model.TmdbMovieItem;
+import com.mopl.external.tmdb.model.TmdbTvItem;
 import com.mopl.storage.provider.FileStorageProvider;
 import java.io.InputStream;
 import java.util.List;

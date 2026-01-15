@@ -1,6 +1,6 @@
-package com.mopl.batch.job;
+package com.mopl.batch.tmdb.job;
 
-import com.mopl.batch.service.TmdbGenreSyncService;
+import com.mopl.batch.tmdb.service.TmdbGenreSyncService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

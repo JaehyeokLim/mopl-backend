@@ -1,7 +1,7 @@
-package com.mopl.batch.job;
+package com.mopl.batch.tmdb.job;
 
-import com.mopl.batch.service.TmdbPopularMovieService;
-import com.mopl.batch.service.TmdbPopularTvService;
+import com.mopl.batch.tmdb.service.TmdbPopularMovieService;
+import com.mopl.batch.tmdb.service.TmdbPopularTvService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

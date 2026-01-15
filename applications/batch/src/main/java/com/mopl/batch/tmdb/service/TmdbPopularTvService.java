@@ -1,7 +1,7 @@
-package com.mopl.batch.service;
+package com.mopl.batch.tmdb.service;
 
-import com.mopl.external.client.TmdbClient;
-import com.mopl.external.model.TmdbMovieItem;
+import com.mopl.external.tmdb.client.TmdbClient;
+import com.mopl.external.tmdb.model.TmdbTvItem;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -10,22 +10,22 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class TmdbPopularMovieService {
+public class TmdbPopularTvService {
 
     private static final int MAX_PAGE = 20; // TMDB rate limit 고려
 
     private final TmdbClient tmdbClient;
     private final TmdbPopularContentUpsertService upsertService;
 
-    public void collectPopularMovies() {
+    public void collectPopularTvSeries() {
         for (int page = 1; page <= MAX_PAGE; page++) {
-            var response = tmdbClient.fetchPopularMovies(page);
+            var response = tmdbClient.fetchPopularTvSeries(page);
 
             response.results().forEach(item -> {
                 if (!isValid(item)) {
                     log.info(
-                        "Invalid TMDB movie data: title={}, poster={}, overviewLength={}",
-                        item.title(),
+                        "Invalid TMDB tv data: name={}, poster={}, overviewLength={}",
+                        item.name(),
                         item.poster_path(),
                         item.overview() == null ? null : item.overview().length()
                     );
@@ -33,13 +33,13 @@ public class TmdbPopularMovieService {
                 }
 
                 try {
-                    upsertService.upsertMovie(item);
+                    upsertService.upsertTv(item);
                 } catch (DataIntegrityViolationException e) {
                     log.debug("TMDB duplicate skipped: externalId={}", item.id());
                 } catch (RuntimeException e) {
                     log.warn(
-                        "Failed to process TMDB movie: title={}, reason={}",
-                        item.title(),
+                        "Failed to process TMDB tv: name={}, reason={}",
+                        item.name(),
                         e.getMessage()
                     );
                 }
@@ -47,8 +47,8 @@ public class TmdbPopularMovieService {
         }
     }
 
-    private boolean isValid(TmdbMovieItem item) {
-        return item.title() != null && !item.title().isBlank()
+    private boolean isValid(TmdbTvItem item) {
+        return item.name() != null && !item.name().isBlank()
             && item.poster_path() != null && !item.poster_path().isBlank()
             && item.overview() != null && !item.overview().isBlank();
     }

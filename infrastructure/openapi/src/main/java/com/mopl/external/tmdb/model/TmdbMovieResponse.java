@@ -1,4 +1,4 @@
-package com.mopl.external.model;
+package com.mopl.external.tmdb.model;
 
 import java.util.List;
 

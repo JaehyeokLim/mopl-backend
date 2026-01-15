@@ -1,10 +1,10 @@
-package com.mopl.external.model;
+package com.mopl.external.tmdb.model;
 
 import java.util.List;
 
-public record TmdbTvItem(
+public record TmdbMovieItem(
     Long id,
-    String name,
+    String title,
     String overview,
     String poster_path,
     List<Integer> genre_ids

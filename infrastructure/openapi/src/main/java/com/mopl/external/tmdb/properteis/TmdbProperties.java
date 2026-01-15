@@ -1,4 +1,4 @@
-package com.mopl.external.properteis;
+package com.mopl.external.tmdb.properteis;
 
 import lombok.Getter;
 import lombok.Setter;

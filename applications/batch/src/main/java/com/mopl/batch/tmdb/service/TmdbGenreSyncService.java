@@ -1,10 +1,10 @@
-package com.mopl.batch.service;
+package com.mopl.batch.tmdb.service;
 
 import com.mopl.domain.model.tag.GenreModel;
 import com.mopl.domain.repository.tag.GenreRepository;
-import com.mopl.external.client.TmdbClient;
-import com.mopl.external.model.TmdbGenreItem;
-import com.mopl.external.model.TmdbGenreResponse;
+import com.mopl.external.tmdb.client.TmdbClient;
+import com.mopl.external.tmdb.model.TmdbGenreItem;
+import com.mopl.external.tmdb.model.TmdbGenreResponse;
 import java.util.HashSet;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;

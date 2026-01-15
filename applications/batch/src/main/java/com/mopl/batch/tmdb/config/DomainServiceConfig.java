@@ -1,4 +1,4 @@
-package com.mopl.batch.config;
+package com.mopl.batch.tmdb.config;
 
 import com.mopl.domain.repository.content.ContentQueryRepository;
 import com.mopl.domain.repository.content.ContentRepository;
