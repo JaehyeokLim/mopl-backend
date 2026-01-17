@@ -4,6 +4,8 @@ import com.mopl.domain.model.tag.GenreModel;
 import com.mopl.domain.repository.tag.GenreRepository;
 import com.mopl.jpa.entity.tag.GenreEntity;
 import com.mopl.jpa.entity.tag.GenreEntityMapper;
+import java.util.Collection;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -28,6 +30,18 @@ public class GenreRepositoryImpl implements GenreRepository {
         return jpaGenreRepository.findByTmdbId(tmdbId)
             .map(genreEntityMapper::toModel);
     }
+
+    @Override
+    public List<GenreModel> findAllByTmdbIdIn(Collection<Long> tmdbIds) {
+        if (tmdbIds == null || tmdbIds.isEmpty()) {
+            return List.of();
+        }
+
+        return jpaGenreRepository.findAllByTmdbIdIn(tmdbIds).stream()
+            .map(genreEntityMapper::toModel)
+            .toList();
+    }
+
 
     @Override
     public long count() {

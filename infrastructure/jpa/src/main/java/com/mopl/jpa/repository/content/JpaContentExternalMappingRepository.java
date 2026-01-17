@@ -2,17 +2,11 @@ package com.mopl.jpa.repository.content;
 
 import com.mopl.domain.model.content.ContentExternalProvider;
 import com.mopl.jpa.entity.content.ContentExternalMappingEntity;
+import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.Optional;
-
 public interface JpaContentExternalMappingRepository extends
-    JpaRepository<ContentExternalMappingEntity, Long> {
-
-    Optional<ContentExternalMappingEntity> findByProviderAndExternalId(
-        ContentExternalProvider provider,
-        Long externalId
-    );
+    JpaRepository<ContentExternalMappingEntity, UUID> {
 
     boolean existsByProviderAndExternalId(
         ContentExternalProvider provider,
