@@ -42,7 +42,6 @@ public class GenreRepositoryImpl implements GenreRepository {
             .toList();
     }
 
-
     @Override
     public long count() {
         return jpaGenreRepository.count();
