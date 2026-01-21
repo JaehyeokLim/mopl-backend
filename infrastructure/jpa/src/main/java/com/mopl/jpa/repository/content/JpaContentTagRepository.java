@@ -22,4 +22,15 @@ public interface JpaContentTagRepository extends JpaRepository<ContentTagEntity,
     @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query("DELETE FROM ContentTagEntity ct WHERE ct.content.id = :contentId")
     void deleteAllByContentId(@Param("contentId") UUID contentId);
+
+    // 이하 메서드들 cleanup batch 전용
+    @Modifying
+    @Query(
+        value = """
+                delete from content_tags
+                where content_id in (:contentIds)
+            """,
+        nativeQuery = true
+    )
+    int deleteAllByContentIds(@Param("contentIds") List<UUID> contentIds);
 }
