@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class StorageCleanupExecutor {
+public class StorageCleanupTxService {
 
     private final FileStorageProvider fileStorageProvider;
     private final ContentDeletionLogRepository contentDeletionLogRepository;

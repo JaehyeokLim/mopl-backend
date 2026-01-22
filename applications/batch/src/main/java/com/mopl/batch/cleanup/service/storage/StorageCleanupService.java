@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 public class StorageCleanupService {
 
     private final ContentDeletionLogRepository contentDeletionLogRepository;
-    private final StorageCleanupExecutor storageCleanupExecutor;
+    private final StorageCleanupTxService storageCleanupTxService;
     private final CleanupProperties cleanupProperties;
     private final CleanupPolicyResolver policyResolver;
 
@@ -30,7 +30,7 @@ public class StorageCleanupService {
                 break;
             }
 
-            totalDeletedFiles += storageCleanupExecutor.cleanupBatch(targets);
+            totalDeletedFiles += storageCleanupTxService.cleanupBatch(targets);
         }
 
         return totalDeletedFiles;

@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ContentCleanupService {
 
-    private final ContentCleanupExecutor executor;
+    private final ContentCleanupTxService executor;
     private final ContentRepository contentRepository;
     private final CleanupProperties cleanupProperties;
     private final CleanupPolicyResolver policyResolver;

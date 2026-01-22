@@ -13,9 +13,9 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 
 @Slf4j
 @Component
-@Profile("cleanup-a")
+@Profile("cleanup-after-commit-delete")
 @RequiredArgsConstructor
-public class ContentCascadeSoftCleanupStrategy implements ContentDeletionStrategy {
+public class ContentAfterCommitThumbnailDeletionStrategy implements ContentDeletionStrategy {
 
     private final FileStorageProvider fileStorageProvider;
 

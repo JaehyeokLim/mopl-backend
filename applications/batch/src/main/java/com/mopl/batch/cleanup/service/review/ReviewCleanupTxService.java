@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class ReviewCleanupExecutor {
+public class ReviewCleanupTxService {
 
     private final ReviewRepository reviewRepository;
 

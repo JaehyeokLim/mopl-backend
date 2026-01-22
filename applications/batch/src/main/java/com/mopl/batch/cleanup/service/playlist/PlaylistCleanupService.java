@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 public class PlaylistCleanupService {
 
     private final PlaylistRepository playlistRepository;
-    private final PlaylistCleanupExecutor executor;
+    private final PlaylistCleanupTxService executor;
     private final CleanupProperties cleanupProperties;
     private final CleanupPolicyResolver policyResolver;
 

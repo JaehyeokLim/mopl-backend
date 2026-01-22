@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ContentCleanupExecutor {
+public class ContentCleanupTxService {
 
     private final ContentTagRepository contentTagRepository;
     private final PlaylistContentRepository playlistContentRepository;

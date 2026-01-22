@@ -10,9 +10,9 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-@Profile("cleanup-b")
+@Profile("cleanup-deletion-log")
 @RequiredArgsConstructor
-public class ContentDeletionLogCleanupStrategy implements ContentDeletionStrategy {
+public class ContentDeletionLogEnqueueStrategy implements ContentDeletionStrategy {
 
     private final ContentDeletionLogRepository contentDeletionLogRepository;
 

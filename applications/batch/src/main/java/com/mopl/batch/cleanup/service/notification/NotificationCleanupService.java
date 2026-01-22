@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 public class NotificationCleanupService {
 
     private final NotificationRepository notificationRepository;
-    private final NotificationCleanupExecutor executor;
+    private final NotificationCleanupTxService executor;
     private final CleanupProperties cleanupProperties;
     private final CleanupPolicyResolver policyResolver;
 

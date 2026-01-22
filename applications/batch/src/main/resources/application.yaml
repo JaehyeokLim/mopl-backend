@@ -9,7 +9,7 @@ spring:
     name: mopl-batch
 
   profiles:
-    active: batch, local, cleanup-b
+    active: batch, local, cleanup-deletion-log
 
   config:
     import:

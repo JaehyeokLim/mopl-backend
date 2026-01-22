@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class PlaylistCleanupExecutor {
+public class PlaylistCleanupTxService {
 
     private final PlaylistContentRepository playlistContentRepository;
     private final PlaylistSubscriberRepository playlistSubscriberRepository;
