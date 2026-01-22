@@ -46,9 +46,6 @@ spring:
     hibernate:
       ddl-auto: validate
     show-sql: true
-  logging:
-    org.hibernate.orm.jdbc.batch: DEBUG
-    org.hibernate.engine.jdbc.batch.internal: DEBUG
 
 ---
 spring.config.activate.on-profile: prod
