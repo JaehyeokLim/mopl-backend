@@ -17,7 +17,7 @@ public class CleanupScheduler {
     private final JobLauncher jobLauncher;
     private final Job cleanupJob;
 
-     @Scheduled(cron = "0 0 4 * * *")
+    @Scheduled(cron = "0 0 4 * * *")
 //    @Scheduled(fixedDelay = 300000) // 5분 테스트용
     public void runCleanup() {
         try {
