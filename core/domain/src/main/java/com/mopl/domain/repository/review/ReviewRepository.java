@@ -18,5 +18,5 @@ public interface ReviewRepository {
 
     int deleteAllByIds(List<UUID> reviewIds);
 
-    int softDeleteByContentIds(List<UUID> contentIds);
+    int softDeleteByContentIds(List<UUID> contentIds, Instant now);
 }

@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 public class ReviewCleanupService {
 
     private final ReviewRepository reviewRepository;
-    private final ReviewCleanupExecutor executor;
+    private final ReviewCleanupTxService executor;
     private final CleanupProperties cleanupProperties;
     private final CleanupPolicyResolver policyResolver;
 

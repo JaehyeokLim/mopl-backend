@@ -29,7 +29,7 @@ public interface JpaNotificationRepository extends JpaRepository<NotificationEnt
         @Param("limit") int limit
     );
 
-    @Modifying
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query(
         value = """
                 delete from notifications

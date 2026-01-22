@@ -34,7 +34,7 @@ public interface JpaPlaylistRepository extends JpaRepository<PlaylistEntity, UUI
         @Param("limit") int limit
     );
 
-    @Modifying
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query(
         value = """
                 delete from playlists

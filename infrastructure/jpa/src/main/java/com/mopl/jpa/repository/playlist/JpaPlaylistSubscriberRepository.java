@@ -42,13 +42,10 @@ public interface JpaPlaylistSubscriberRepository extends
     );
 
     // 이하 메서드들 cleanup batch 전용
-    @Modifying
-    @Query(
-        value = """
-                delete from playlist_subscribers
-                where playlist_id in (:playlistIds)
-            """,
-        nativeQuery = true
-    )
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+            delete from PlaylistSubscriberEntity ps
+            where ps.playlist.id in :playlistIds
+        """)
     int deleteAllByPlaylistIds(@Param("playlistIds") List<UUID> playlistIds);
 }
