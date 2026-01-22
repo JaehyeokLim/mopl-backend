@@ -1,4 +1,4 @@
-package com.mopl.batch.tmdb.initializer;
+package com.mopl.batch.collect.tmdb.initializer;
 
 import com.mopl.batch.tmdb.service.TmdbGenreSyncService;
 import com.mopl.domain.repository.tag.GenreRepository;

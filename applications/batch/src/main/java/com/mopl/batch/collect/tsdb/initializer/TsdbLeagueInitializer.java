@@ -1,4 +1,4 @@
-package com.mopl.batch.tsdb.initializer;
+package com.mopl.batch.collect.tsdb.initializer;
 
 import com.mopl.batch.tsdb.service.TsdbLeagueSyncService;
 import com.mopl.domain.repository.league.LeagueRepository;
