@@ -1,6 +1,7 @@
 package com.mopl.batch.cleanup.service.content;
 
 import com.mopl.batch.cleanup.strategy.content.ContentDeletionStrategy;
+import com.mopl.domain.repository.content.ContentExternalMappingRepository;
 import com.mopl.domain.repository.content.ContentRepository;
 import com.mopl.domain.repository.content.ContentTagRepository;
 import com.mopl.domain.repository.playlist.PlaylistContentRepository;
@@ -22,27 +23,22 @@ public class ContentCleanupExecutor {
     private final PlaylistContentRepository playlistContentRepository;
     private final ContentRepository contentRepository;
     private final ReviewRepository reviewRepository;
+    private final ContentExternalMappingRepository externalMappingRepository;
     private final ContentDeletionStrategy deletionStrategy;
 
     @Transactional
     public int cleanupBatch(List<UUID> contentIds) {
-        Map<UUID, String> thumbnailPathsByContentId = contentRepository.findThumbnailPathsByIds(
-            contentIds);
+        Map<UUID, String> thumbnailPaths = contentRepository.findThumbnailPathsByIds(contentIds);
 
-        contentTagRepository.deleteAllByContentIds(contentIds);
-        playlistContentRepository.deleteAllByContentIds(contentIds);
+        int deletedMappings = externalMappingRepository.deleteAllByContentIds(contentIds);
+
+        int deletedTags = contentTagRepository.deleteAllByContentIds(contentIds);
+        int deletedPlaylistContents = playlistContentRepository.deleteAllByContentIds(contentIds);
 
         int softDeletedReviews = reviewRepository.softDeleteByContentIds(contentIds);
-        int affectedThumbnails = deletionStrategy.onDeleted(thumbnailPathsByContentId);
-        int deletedContents = contentRepository.deleteAllByIds(contentIds);
+        int affectedThumbnails = deletionStrategy.onDeleted(thumbnailPaths);
 
-        if (softDeletedReviews > 0) {
-            log.info(
-                "review soft-deleted by content cleanup. contentCount={} softDeletedReviews={}",
-                contentIds.size(),
-                softDeletedReviews
-            );
-        }
+        int deletedContents = contentRepository.deleteAllByIds(contentIds);
 
         if (deletedContents != contentIds.size()) {
             log.warn(
@@ -52,13 +48,17 @@ public class ContentCleanupExecutor {
             );
         }
 
-        if (affectedThumbnails != thumbnailPathsByContentId.size()) {
-            log.info(
-                "thumbnail handling summary. requested={} affected={}",
-                thumbnailPathsByContentId.size(),
-                affectedThumbnails
-            );
-        }
+        log.info(
+            "content cleanup batch done. requested={} deletedContents={} deletedMappings={} deletedTags={} deletedPlaylistContents={} softDeletedReviews={} affectedThumbnails={}/{}",
+            contentIds.size(),
+            deletedContents,
+            deletedMappings,
+            deletedTags,
+            deletedPlaylistContents,
+            softDeletedReviews,
+            affectedThumbnails,
+            thumbnailPaths.size()
+        );
 
         return deletedContents;
     }
