@@ -38,4 +38,11 @@ mopl:
       storage:
         chunk-size: 200
 
+    collect:
+      tmdb:
+        defaults:
+          max-page: 4
 
+      tsdb:
+        defaults:
+          sleep-ms: 300
