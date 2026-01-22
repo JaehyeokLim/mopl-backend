@@ -3,6 +3,7 @@ package com.mopl.batch.cleanup.service.storage;
 import com.mopl.domain.repository.content.ContentDeletionLogRepository;
 import com.mopl.domain.repository.content.dto.ContentDeletionLogItem;
 import com.mopl.storage.provider.FileStorageProvider;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -21,6 +22,8 @@ public class StorageCleanupExecutor {
 
     @Transactional
     public int cleanupBatch(List<ContentDeletionLogItem> targets) {
+        Instant now = Instant.now();
+
         List<UUID> successLogIds = new ArrayList<>();
 
         for (ContentDeletionLogItem target : targets) {
@@ -41,7 +44,7 @@ public class StorageCleanupExecutor {
         }
 
         if (!successLogIds.isEmpty()) {
-            contentDeletionLogRepository.markImageProcessed(successLogIds);
+            contentDeletionLogRepository.markImageProcessed(successLogIds, now);
         }
 
         return successLogIds.size();

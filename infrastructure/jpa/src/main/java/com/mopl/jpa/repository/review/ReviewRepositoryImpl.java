@@ -44,7 +44,7 @@ public class ReviewRepositoryImpl implements ReviewRepository {
     }
 
     @Override
-    public int softDeleteByContentIds(List<UUID> contentIds) {
-        return jpaReviewRepository.softDeleteByContentIds(contentIds);
+    public int softDeleteByContentIds(List<UUID> contentIds, Instant now) {
+        return jpaReviewRepository.softDeleteByContentIds(contentIds, now);
     }
 }

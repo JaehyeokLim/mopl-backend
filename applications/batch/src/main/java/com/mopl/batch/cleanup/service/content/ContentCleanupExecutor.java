@@ -6,6 +6,7 @@ import com.mopl.domain.repository.content.ContentRepository;
 import com.mopl.domain.repository.content.ContentTagRepository;
 import com.mopl.domain.repository.playlist.PlaylistContentRepository;
 import com.mopl.domain.repository.review.ReviewRepository;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -28,6 +29,8 @@ public class ContentCleanupExecutor {
 
     @Transactional
     public int cleanupBatch(List<UUID> contentIds) {
+        Instant now = Instant.now();
+
         Map<UUID, String> thumbnailPaths = contentRepository.findThumbnailPathsByIds(contentIds);
 
         int deletedMappings = externalMappingRepository.deleteAllByContentIds(contentIds);
@@ -35,7 +38,7 @@ public class ContentCleanupExecutor {
         int deletedTags = contentTagRepository.deleteAllByContentIds(contentIds);
         int deletedPlaylistContents = playlistContentRepository.deleteAllByContentIds(contentIds);
 
-        int softDeletedReviews = reviewRepository.softDeleteByContentIds(contentIds);
+        int softDeletedReviews = reviewRepository.softDeleteByContentIds(contentIds, now);
         int affectedThumbnails = deletionStrategy.onDeleted(thumbnailPaths);
 
         int deletedContents = contentRepository.deleteAllByIds(contentIds);

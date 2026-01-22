@@ -34,7 +34,7 @@ public interface JpaReviewRepository extends JpaRepository<ReviewEntity, UUID> {
         @Param("limit") int limit
     );
 
-    @Modifying
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query(
         value = """
                 delete from reviews
@@ -44,15 +44,15 @@ public interface JpaReviewRepository extends JpaRepository<ReviewEntity, UUID> {
     )
     int deleteAllByIds(@Param("reviewIds") List<UUID> reviewIds);
 
-    @Modifying
-    @Query(
-        value = """
-                update reviews
-                set deleted_at = utc_timestamp(6)
-                where content_id in (:contentIds)
-                  and deleted_at is null
-            """,
-        nativeQuery = true
-    )
-    int softDeleteByContentIds(@Param("contentIds") List<UUID> contentIds);
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+            update ReviewEntity r
+            set r.deletedAt = :now
+            where r.content.id in :contentIds
+              and r.deletedAt is null
+        """)
+    int softDeleteByContentIds(
+        @Param("contentIds") List<UUID> contentIds,
+        @Param("now") Instant now
+    );
 }

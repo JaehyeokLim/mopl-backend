@@ -18,7 +18,7 @@ public interface JpaContentExternalMappingRepository extends
     );
 
     // 이하 메서드들 cleanup batch 전용
-    @Modifying
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("""
             delete from ContentExternalMappingEntity m
             where m.content.id in :contentIds

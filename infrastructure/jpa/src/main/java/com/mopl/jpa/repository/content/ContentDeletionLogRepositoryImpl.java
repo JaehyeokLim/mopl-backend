@@ -3,6 +3,7 @@ package com.mopl.jpa.repository.content;
 import com.mopl.domain.repository.content.ContentDeletionLogRepository;
 import com.mopl.domain.repository.content.dto.ContentDeletionLogItem;
 import com.mopl.jpa.entity.content.ContentDeletionLogEntity;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -11,8 +12,10 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @RequiredArgsConstructor
@@ -56,9 +59,14 @@ public class ContentDeletionLogRepositoryImpl implements ContentDeletionLogRepos
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<ContentDeletionLogItem> findImageCleanupTargets(int limit) {
-        return jpaContentDeletionLogRepository.findImageCleanupTargets(limit).stream()
+        Pageable pageable = PageRequest.of(
+            0,
+            limit,
+            Sort.by(Sort.Direction.ASC, "deletedAt")
+        );
+
+        return jpaContentDeletionLogRepository.findImageCleanupTargets(pageable).stream()
             .map(row -> new ContentDeletionLogItem(
                 row.getLogId(),
                 row.getContentId(),
@@ -68,22 +76,25 @@ public class ContentDeletionLogRepositoryImpl implements ContentDeletionLogRepos
     }
 
     @Override
-    @Transactional
-    public int markImageProcessed(List<UUID> logIds) {
+    public int markImageProcessed(List<UUID> logIds, Instant now) {
         if (logIds == null || logIds.isEmpty()) {
             return 0;
         }
-        return jpaContentDeletionLogRepository.markImageProcessed(logIds);
+        return jpaContentDeletionLogRepository.markImageProcessed(logIds, now);
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<UUID> findFullyProcessedLogIds(int limit) {
-        return jpaContentDeletionLogRepository.findFullyProcessedLogIds(limit);
+        Pageable pageable = PageRequest.of(
+            0,
+            limit,
+            Sort.by(Sort.Direction.ASC, "deletedAt")
+        );
+
+        return jpaContentDeletionLogRepository.findFullyProcessedLogIds(pageable);
     }
 
     @Override
-    @Transactional
     public int deleteAllByIds(List<UUID> logIds) {
         if (logIds == null || logIds.isEmpty()) {
             return 0;
