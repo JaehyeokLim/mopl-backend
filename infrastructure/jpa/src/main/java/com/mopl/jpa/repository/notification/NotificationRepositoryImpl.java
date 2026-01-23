@@ -4,13 +4,11 @@ import com.mopl.domain.model.notification.NotificationModel;
 import com.mopl.domain.repository.notification.NotificationRepository;
 import com.mopl.jpa.entity.notification.NotificationEntity;
 import com.mopl.jpa.entity.notification.NotificationEntityMapper;
-import com.mopl.jpa.entity.user.UserEntity;
-import com.mopl.jpa.repository.user.JpaUserRepository;
-import java.time.Instant;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -20,7 +18,6 @@ public class NotificationRepositoryImpl implements NotificationRepository {
 
     private final JpaNotificationRepository jpaNotificationRepository;
     private final NotificationEntityMapper notificationEntityMapper;
-    private final JpaUserRepository jpaUserRepository;
 
     @Override
     public Optional<NotificationModel> findById(UUID notificationId) {
@@ -29,17 +26,23 @@ public class NotificationRepositoryImpl implements NotificationRepository {
     }
 
     @Override
-    public NotificationModel save(NotificationModel notification) {
-        UserEntity receiver = jpaUserRepository.getReferenceById(notification.getReceiver()
-            .getId());
-
-        NotificationEntity entity = notificationEntityMapper.toEntity(notification, receiver);
-        NotificationEntity saved = jpaNotificationRepository.save(entity);
-
-        return notificationEntityMapper.toModel(saved);
+    public NotificationModel save(NotificationModel notificationModel) {
+        NotificationEntity notificationEntity = notificationEntityMapper.toEntity(notificationModel);
+        NotificationEntity savedNotificationEntity = jpaNotificationRepository.save(notificationEntity);
+        return notificationEntityMapper.toModel(savedNotificationEntity);
     }
 
-    // 이하 메서드들 cleanup batch 전용
+    @Override
+    public List<NotificationModel> saveAll(List<NotificationModel> notifications) {
+        List<NotificationEntity> entities = notifications.stream()
+            .map(notificationEntityMapper::toEntity)
+            .toList();
+        List<NotificationEntity> savedEntities = jpaNotificationRepository.saveAll(entities);
+        return savedEntities.stream()
+            .map(notificationEntityMapper::toModel)
+            .toList();
+    }
+
     @Override
     public List<UUID> findCleanupTargets(Instant threshold, int limit) {
         return jpaNotificationRepository.findCleanupTargets(threshold, limit);

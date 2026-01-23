@@ -6,8 +6,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.List;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -21,7 +21,7 @@ public interface JpaPlaylistSubscriberRepository extends
 
     boolean existsByPlaylistIdAndSubscriberId(UUID playlistId, UUID subscriberId);
 
-    @Modifying
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("""
         DELETE FROM PlaylistSubscriberEntity ps
         WHERE ps.playlist.id = :playlistId AND ps.subscriber.id = :subscriberId
@@ -41,7 +41,9 @@ public interface JpaPlaylistSubscriberRepository extends
         @Param("playlistIds") Collection<UUID> playlistIds
     );
 
-    // 이하 메서드들 cleanup batch 전용
+    @Query("SELECT ps.subscriber.id FROM PlaylistSubscriberEntity ps WHERE ps.playlist.id = :playlistId")
+    List<UUID> findSubscriberIdsByPlaylistId(@Param("playlistId") UUID playlistId);
+
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("""
             delete from PlaylistSubscriberEntity ps

@@ -13,7 +13,8 @@ public interface NotificationRepository {
 
     NotificationModel save(NotificationModel notification);
 
-    // 이하 메서드들 cleanup batch 전용
+    List<NotificationModel> saveAll(List<NotificationModel> notifications);
+
     List<UUID> findCleanupTargets(Instant threshold, int limit);
 
     int deleteAllByIds(List<UUID> notificationIds);
