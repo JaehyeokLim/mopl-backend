@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 public class ContentDeletionLogCleanupService {
 
     private final ContentDeletionLogRepository contentDeletionLogRepository;
-    private final ContentDeletionLogCleanupExecutor executor;
+    private final ContentDeletionLogCleanupTxService executor;
     private final CleanupProperties cleanupProperties;
     private final CleanupPolicyResolver policyResolver;
 
