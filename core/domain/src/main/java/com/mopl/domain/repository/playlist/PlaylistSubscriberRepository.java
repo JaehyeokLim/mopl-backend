@@ -2,8 +2,8 @@ package com.mopl.domain.repository.playlist;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.List;
 import java.util.UUID;
 
 public interface PlaylistSubscriberRepository {
@@ -16,12 +16,13 @@ public interface PlaylistSubscriberRepository {
 
     long countByPlaylistId(UUID playlistId);
 
+    Map<UUID, Long> countByPlaylistIdIn(Collection<UUID> playlistIds);
+
     boolean existsByPlaylistIdAndSubscriberId(UUID playlistId, UUID subscriberId);
 
     void save(UUID playlistId, UUID subscriberId);
 
     boolean deleteByPlaylistIdAndSubscriberId(UUID playlistId, UUID subscriberId);
 
-    // 이하 메서드들 cleanup batch 전용
     int deleteAllByPlaylistIds(List<UUID> playlistIds);
 }

@@ -76,11 +76,11 @@ public class ContentDeletionLogRepositoryImpl implements ContentDeletionLogRepos
     }
 
     @Override
-    public int markImageProcessed(List<UUID> logIds, Instant now) {
+    public void markImageProcessed(List<UUID> logIds, Instant now) {
         if (logIds == null || logIds.isEmpty()) {
-            return 0;
+            return;
         }
-        return jpaContentDeletionLogRepository.markImageProcessed(logIds, now);
+        jpaContentDeletionLogRepository.markImageProcessed(logIds, now);
     }
 
     @Override

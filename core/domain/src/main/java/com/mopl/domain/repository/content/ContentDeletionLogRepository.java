@@ -12,7 +12,7 @@ public interface ContentDeletionLogRepository {
 
     List<ContentDeletionLogItem> findImageCleanupTargets(int limit);
 
-    int markImageProcessed(List<UUID> logIds, Instant now);
+    void markImageProcessed(List<UUID> logIds, Instant now);
 
     List<UUID> findFullyProcessedLogIds(int limit);
 

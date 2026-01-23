@@ -19,7 +19,6 @@ public class TsdbCollectScheduler {
     private final Job tsdbLeagueSyncJob;
 
     @Scheduled(cron = "0 10 2 * * *")
-//    @Scheduled(fixedDelay = 300000) // 5분 테스트용
     public void runTsdbCollect() {
         try {
             JobParameters params = new JobParametersBuilder()

@@ -71,7 +71,7 @@ public class RedisWatchingSessionQueryRepositoryImpl implements WatchingSessionQ
             );
         }
 
-        WatchingSessionModel last = result.get(result.size() - 1);
+        WatchingSessionModel last = result.getLast();
         String nextCursor = last.getCreatedAt() != null ? last.getCreatedAt().toString() : null;
         UUID nextIdAfter = last.getId();
 

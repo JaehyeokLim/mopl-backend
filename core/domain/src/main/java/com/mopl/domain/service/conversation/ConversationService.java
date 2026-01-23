@@ -18,11 +18,12 @@ import com.mopl.domain.repository.conversation.DirectMessageRepository;
 import com.mopl.domain.repository.conversation.ReadStatusRepository;
 import com.mopl.domain.repository.user.UserRepository;
 import com.mopl.domain.support.cursor.CursorResponse;
+import lombok.RequiredArgsConstructor;
+
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class ConversationService {
@@ -61,7 +62,10 @@ public class ConversationService {
                 conversationId, request, userId
             );
         if (!conversationQueryRepository.existsParticipant(conversationId, userId)) {
-            throw new ConversationAccessDeniedException(conversationId, userId);
+            throw ConversationAccessDeniedException.withConversationIdAndUserId(
+                conversationId,
+                userId
+            );
         }
         ReadStatusModel otherReadStatusModel = readStatusRepository
             .findOtherReadStatus(conversationId, userId);
@@ -170,8 +174,11 @@ public class ConversationService {
         UUID userId
     ) {
 
-        return directMessageRepository.findOtherDirectMessage(conversationId, directMessageId,
-            userId)
+        return directMessageRepository.findOtherDirectMessage(
+            conversationId,
+            directMessageId,
+            userId
+        )
             .orElse(null);
     }
 
@@ -222,11 +229,14 @@ public class ConversationService {
 
     public ConversationModel getConversation(UUID conversationId, UUID userId) {
         if (!conversationQueryRepository.existsParticipant(conversationId, userId)) {
-            throw new ConversationAccessDeniedException(conversationId, userId);
+            throw ConversationAccessDeniedException.withConversationIdAndUserId(
+                conversationId,
+                userId
+            );
         }
-        //lastmessage랑 같이 옴
+        // lastmessage랑 같이 옴
         ConversationModel conversationModel = conversationRepository.find(conversationId)
-            .orElseThrow(() -> new ConversationNotFoundException(conversationId));
+            .orElseThrow(() -> ConversationNotFoundException.withId(conversationId));
         DirectMessageModel lastMessage = conversationModel.getLastMessage();
 
         // 상대방 ReadStatus
@@ -236,7 +246,7 @@ public class ConversationService {
         // 상대방 유저 세팅
         conversationModel.withUser(otherReadStatus.getUser());
 
-        //receiver
+        // receiver
         if (lastMessage != null) {
             DirectMessageModel directMessageModel = lastMessage.getSender().getId().equals(userId)
                 ? conversationModel.getLastMessage()
@@ -266,7 +276,7 @@ public class ConversationService {
     public DirectMessageModel getDirectMessageById(UUID directMessageId) {
 
         return directMessageRepository.findById(directMessageId)
-            .orElseThrow(() -> new DirectMessageNotFoundException(directMessageId));
+            .orElseThrow(() -> DirectMessageNotFoundException.withId(directMessageId));
     }
 
     public List<ReadStatusModel> getReadStatusByConversationId(UUID conversationId) {
@@ -280,7 +290,7 @@ public class ConversationService {
 
     public ReadStatusModel getReadStatusById(UUID readStatusId) {
         return readStatusRepository.findById(readStatusId)
-            .orElseThrow(() -> new ReadStatusNotFoundException(readStatusId));
+            .orElseThrow(() -> ReadStatusNotFoundException.withId(readStatusId));
     }
 
     public ReadStatusModel getReadStatusByConversationIdAndParticipantId(

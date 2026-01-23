@@ -19,7 +19,6 @@ public class TmdbCollectScheduler {
     private final Job tmdbGenreSyncJob;
 
     @Scheduled(cron = "0 20 2 * * *")
-//    @Scheduled(fixedDelay = 300000) // 5분 테스트용
     public void runTmdbCollect() {
         try {
             JobParameters params = new JobParametersBuilder()
