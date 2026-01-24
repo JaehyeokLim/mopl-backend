@@ -1,5 +1,6 @@
 server:
   port: 8081
+  shutdown: graceful
 
 spring:
   main:
@@ -11,27 +12,15 @@ spring:
   config:
     import:
       - optional:file:.env[.properties]
+      - cache.yaml
       - jpa.yaml
+      - redis.yaml
       - security.yaml
       - storage.yaml
-      - redis.yaml
-      - cache.yaml
   threads:
     virtual:
       enabled: true
-  #더미
-  mail:
-    username: dummy
-    password: dummy
-    host: localhost
-    port: 25
 
-
-
-  cache:
-    type: redis
-
-#===============================
 management:
   endpoints:
     web:

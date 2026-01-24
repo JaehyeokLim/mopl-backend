@@ -5,7 +5,7 @@ import com.mopl.domain.repository.watchingsession.WatchingSessionQueryRepository
 import com.mopl.domain.repository.watchingsession.WatchingSessionQueryRequest;
 import com.mopl.domain.support.cursor.CursorResponse;
 import com.mopl.domain.support.cursor.SortDirection;
-import com.mopl.domain.support.redis.WatchingSessionRedisKeys;
+import com.mopl.redis.support.WatchingSessionRedisKeys;
 import com.mopl.redis.support.cursor.RedisCursorPaginationHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -16,10 +16,9 @@ import org.springframework.util.StringUtils;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
-
-import static org.springframework.util.StringUtils.hasText;
 
 @Repository
 @RequiredArgsConstructor
@@ -28,37 +27,38 @@ public class RedisWatchingSessionQueryRepositoryImpl implements WatchingSessionQ
     private final RedisTemplate<String, Object> redisTemplate;
 
     @Override
-    public CursorResponse<WatchingSessionModel> findByContentId(
+    public CursorResponse<WatchingSessionModel> findAllByContentId(
         UUID contentId,
         WatchingSessionQueryRequest request
     ) {
-        String zsetKey = WatchingSessionRedisKeys.contentSessionsZsetKey(contentId);
+        String zsetKey = WatchingSessionRedisKeys.contentWatchersKey(contentId);
         WatchingSessionSortFieldSupport sortField = WatchingSessionSortFieldSupport.from(
-            request.sortBy());
+            request.sortBy()
+        );
 
-        long totalCount = countTotal(zsetKey, request.watcherNameLike());
+        Long totalCount = redisTemplate.opsForZSet().zCard(zsetKey);
+        long total = totalCount != null ? totalCount : 0L;
 
         int limit = request.limit();
-        int fetchSize = Math.min(limit * 5, 2000);
+        int fetchSize = Math.min(limit * 2, 500);
 
-        List<WatchingSessionModel> candidates = fetchCandidates(zsetKey, request, sortField,
-            fetchSize);
+        List<WatchingSessionModel> candidates = fetchCandidates(zsetKey, request, sortField, fetchSize);
 
         List<WatchingSessionModel> afterCursor = RedisCursorPaginationHelper.applyCursor(
             candidates,
             request,
             sortField,
             sortField::extractValue,
-            WatchingSessionModel::getId
+            WatchingSessionModel::getWatcherId
         );
 
         return RedisCursorPaginationHelper.buildResponse(
             afterCursor,
             request,
             sortField,
-            totalCount,
+            total,
             sortField::extractValue,
-            WatchingSessionModel::getId
+            WatchingSessionModel::getWatcherId
         );
     }
 
@@ -69,7 +69,6 @@ public class RedisWatchingSessionQueryRepositoryImpl implements WatchingSessionQ
         int fetchSize
     ) {
         SortDirection direction = request.sortDirection();
-
         Instant cursorInstant = sortField.deserializeCursor(request.cursor());
 
         Set<ZSetOperations.TypedTuple<Object>> tuples;
@@ -83,23 +82,26 @@ public class RedisWatchingSessionQueryRepositoryImpl implements WatchingSessionQ
             return List.of();
         }
 
-        List<WatchingSessionModel> models = new ArrayList<>(tuples.size());
+        List<UUID> watcherIds = tuples.stream()
+            .filter(tuple -> tuple != null && tuple.getValue() != null)
+            .map(tuple -> parseUuid(tuple.getValue().toString()))
+            .filter(Objects::nonNull)
+            .toList();
 
-        for (ZSetOperations.TypedTuple<Object> tuple : tuples) {
-            if (tuple == null || tuple.getValue() == null) {
-                continue;
-            }
+        if (watcherIds.isEmpty()) {
+            return List.of();
+        }
 
-            String sessionIdStr = tuple.getValue().toString();
-            UUID sessionId = parseUuid(sessionIdStr);
-            if (sessionId == null) {
-                continue;
-            }
+        List<String> sessionKeys = watcherIds.stream()
+            .map(WatchingSessionRedisKeys::watcherSessionKey)
+            .toList();
 
-            Object stored = redisTemplate.opsForValue().get(WatchingSessionRedisKeys.sessionKey(
-                sessionId));
-            if (stored instanceof WatchingSessionModel model) {
-                if (matchesWatcherNameFilter(model, request.watcherNameLike())) {
+        List<Object> storedSessions = redisTemplate.opsForValue().multiGet(sessionKeys);
+
+        List<WatchingSessionModel> models = new ArrayList<>(watcherIds.size());
+        if (storedSessions != null) {
+            for (Object stored : storedSessions) {
+                if (stored instanceof WatchingSessionModel model) {
                     models.add(model);
                 }
             }
@@ -109,7 +111,7 @@ public class RedisWatchingSessionQueryRepositoryImpl implements WatchingSessionQ
             .sorted((a, b) -> RedisCursorPaginationHelper.compareByFieldThenId(
                 a, b,
                 sortField::extractValue,
-                WatchingSessionModel::getId,
+                WatchingSessionModel::getWatcherId,
                 direction
             ))
             .toList();
@@ -146,61 +148,11 @@ public class RedisWatchingSessionQueryRepositoryImpl implements WatchingSessionQ
 
         return redisTemplate.opsForZSet().reverseRangeByScoreWithScores(
             zsetKey,
-            cursorScore,
             Double.NEGATIVE_INFINITY,
+            cursorScore,
             0,
             fetchSize
         );
-    }
-
-    private long countTotal(String zsetKey, String watcherNameLike) {
-        if (!StringUtils.hasText(watcherNameLike) || !StringUtils.hasText(watcherNameLike.trim())) {
-            Long size = redisTemplate.opsForZSet().size(zsetKey);
-            return size != null ? size : 0L;
-        }
-
-        Set<Object> allSessionIds = redisTemplate.opsForZSet().range(zsetKey, 0, -1);
-        if (allSessionIds == null || allSessionIds.isEmpty()) {
-            return 0L;
-        }
-
-        long count = 0;
-        for (Object obj : allSessionIds) {
-            if (obj == null) {
-                continue;
-            }
-
-            UUID sessionId = parseUuid(obj.toString());
-            if (sessionId == null) {
-                continue;
-            }
-
-            Object stored = redisTemplate.opsForValue().get(WatchingSessionRedisKeys.sessionKey(
-                sessionId));
-            if (stored instanceof WatchingSessionModel model) {
-                if (matchesWatcherNameFilter(model, watcherNameLike)) {
-                    count++;
-                }
-            }
-        }
-        return count;
-    }
-
-    private boolean matchesWatcherNameFilter(WatchingSessionModel session, String watcherNameLike) {
-        if (!hasText(watcherNameLike)) {
-            return true;
-        }
-
-        String keyword = watcherNameLike.trim();
-        if (!hasText(keyword)) {
-            return true;
-        }
-
-        if (session.getWatcher() == null || !hasText(session.getWatcher().getName())) {
-            return false;
-        }
-
-        return session.getWatcher().getName().toLowerCase().contains(keyword.toLowerCase());
     }
 
     private UUID parseUuid(String value) {

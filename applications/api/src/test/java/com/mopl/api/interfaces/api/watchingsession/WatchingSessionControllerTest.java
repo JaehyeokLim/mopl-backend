@@ -7,7 +7,6 @@ import com.mopl.api.interfaces.api.content.dto.ContentSummary;
 import com.mopl.api.interfaces.api.user.dto.UserSummary;
 import com.mopl.api.interfaces.api.watchingsession.dto.WatchingSessionResponse;
 import com.mopl.domain.exception.user.UserNotFoundException;
-import com.mopl.domain.model.content.ContentModel.ContentType;
 import com.mopl.domain.repository.watchingsession.WatchingSessionQueryRequest;
 import com.mopl.domain.support.cursor.CursorResponse;
 import com.mopl.domain.support.cursor.SortDirection;
@@ -69,23 +68,22 @@ class WatchingSessionControllerTest {
     }
 
     private static WatchingSessionResponse createWatchingSessionResponse(
-        UUID sessionId,
         UUID watcherId,
         UUID contentId
     ) {
         return new WatchingSessionResponse(
-            sessionId,
+            watcherId,
             Instant.now(),
             new UserSummary(watcherId, "TestUser", "https://cdn.example.com/profile.jpg"),
             new ContentSummary(
                 contentId,
-                ContentType.movie,
+                null,
                 "인셉션",
-                "꿈속의 꿈을 다룬 SF 영화",
-                "https://cdn.example.com/thumbnail.jpg",
-                List.of("SF", "Action"),
-                4.5,
-                100
+                null,
+                null,
+                List.of(),
+                0.0,
+                0
             )
         );
     }
@@ -99,18 +97,16 @@ class WatchingSessionControllerTest {
         void withValidRequest_returns200OKWithSessionList() throws Exception {
             // given
             UUID contentId = UUID.randomUUID();
-            UUID sessionId1 = UUID.randomUUID();
-            UUID sessionId2 = UUID.randomUUID();
             UUID watcherId1 = UUID.randomUUID();
             UUID watcherId2 = UUID.randomUUID();
 
-            WatchingSessionResponse session1 = createWatchingSessionResponse(sessionId1, watcherId1, contentId);
-            WatchingSessionResponse session2 = createWatchingSessionResponse(sessionId2, watcherId2, contentId);
+            WatchingSessionResponse session1 = createWatchingSessionResponse(watcherId1, contentId);
+            WatchingSessionResponse session2 = createWatchingSessionResponse(watcherId2, contentId);
 
             CursorResponse<WatchingSessionResponse> cursorResponse = CursorResponse.of(
                 List.of(session1, session2),
                 Instant.now().toString(),
-                sessionId2,
+                watcherId2,
                 true,
                 50,
                 "createdAt",
@@ -129,7 +125,7 @@ class WatchingSessionControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").isArray())
                 .andExpect(jsonPath("$.data.length()").value(2))
-                .andExpect(jsonPath("$.data[0].id").value(sessionId1.toString()))
+                .andExpect(jsonPath("$.data[0].id").value(watcherId1.toString()))
                 .andExpect(jsonPath("$.data[0].watcher.userId").value(watcherId1.toString()))
                 .andExpect(jsonPath("$.data[0].content.id").value(contentId.toString()))
                 .andExpect(jsonPath("$.hasNext").value(true))
@@ -170,10 +166,9 @@ class WatchingSessionControllerTest {
             // given
             UUID contentId = UUID.randomUUID();
             UUID idAfter = UUID.randomUUID();
-            UUID sessionId = UUID.randomUUID();
             UUID watcherId = UUID.randomUUID();
 
-            WatchingSessionResponse session = createWatchingSessionResponse(sessionId, watcherId, contentId);
+            WatchingSessionResponse session = createWatchingSessionResponse(watcherId, contentId);
 
             CursorResponse<WatchingSessionResponse> cursorResponse = CursorResponse.of(
                 List.of(session),
@@ -237,10 +232,9 @@ class WatchingSessionControllerTest {
         void withValidWatcherId_returns200OK() throws Exception {
             // given
             UUID watcherId = UUID.randomUUID();
-            UUID sessionId = UUID.randomUUID();
             UUID contentId = UUID.randomUUID();
 
-            WatchingSessionResponse response = createWatchingSessionResponse(sessionId, watcherId, contentId);
+            WatchingSessionResponse response = createWatchingSessionResponse(watcherId, contentId);
 
             given(watchingSessionFacade.getWatchingSession(watcherId)).willReturn(Optional.of(response));
 
@@ -248,7 +242,7 @@ class WatchingSessionControllerTest {
             mockMvc.perform(get("/api/users/{watcherId}/watching-sessions", watcherId)
                 .with(user(mockUserDetails)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(sessionId.toString()))
+                .andExpect(jsonPath("$.id").value(watcherId.toString()))
                 .andExpect(jsonPath("$.watcher.userId").value(watcherId.toString()))
                 .andExpect(jsonPath("$.watcher.name").value("TestUser"))
                 .andExpect(jsonPath("$.content.id").value(contentId.toString()))
@@ -268,8 +262,7 @@ class WatchingSessionControllerTest {
             // when & then
             mockMvc.perform(get("/api/users/{watcherId}/watching-sessions", watcherId)
                 .with(user(mockUserDetails)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").doesNotExist());
+                .andExpect(status().isNoContent());
 
             then(watchingSessionFacade).should().getWatchingSession(watcherId);
         }

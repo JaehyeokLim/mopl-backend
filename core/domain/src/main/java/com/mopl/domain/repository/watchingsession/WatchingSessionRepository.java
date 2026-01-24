@@ -14,4 +14,8 @@ public interface WatchingSessionRepository {
     long countByContentId(UUID contentId);
 
     Map<UUID, Long> countByContentIdIn(List<UUID> contentIds);
+
+    WatchingSessionModel save(WatchingSessionModel model);
+
+    void delete(WatchingSessionModel model);
 }
