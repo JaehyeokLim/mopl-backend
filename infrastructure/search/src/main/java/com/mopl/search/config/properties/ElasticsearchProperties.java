@@ -1,4 +1,4 @@
-package com.mopl.search.config;
+package com.mopl.search.config.properties;
 
 import lombok.Getter;
 import lombok.Setter;
