@@ -26,25 +26,29 @@ public class ReviewRepositoryImpl implements ReviewRepository {
     }
 
     @Override
+    public boolean existsByContentIdAndAuthorId(UUID contentId, UUID authorId) {
+        return jpaReviewRepository.existsByContentIdAndAuthorIdAndDeletedAtIsNull(contentId, authorId);
+    }
+
+    @Override
     public ReviewModel save(ReviewModel reviewModel) {
         ReviewEntity reviewEntity = reviewEntityMapper.toEntity(reviewModel);
         ReviewEntity savedReviewEntity = jpaReviewRepository.save(reviewEntity);
-        return reviewEntityMapper.toModel(savedReviewEntity);
+        return reviewEntityMapper.toModelWithContentAndAuthor(savedReviewEntity);
     }
 
-    // 이하 메서드들 cleanup batch 전용
     @Override
     public List<UUID> findCleanupTargets(Instant threshold, int limit) {
         return jpaReviewRepository.findCleanupTargets(threshold, limit);
     }
 
     @Override
-    public int deleteAllByIds(List<UUID> reviewIds) {
-        return jpaReviewRepository.deleteAllByIds(reviewIds);
+    public int deleteByIdIn(List<UUID> reviewIds) {
+        return jpaReviewRepository.deleteByIdIn(reviewIds);
     }
 
     @Override
-    public int softDeleteByContentIds(List<UUID> contentIds, Instant now) {
-        return jpaReviewRepository.softDeleteByContentIds(contentIds, now);
+    public int softDeleteByContentIdIn(List<UUID> contentIds, Instant now) {
+        return jpaReviewRepository.softDeleteByContentIdIn(contentIds, now);
     }
 }

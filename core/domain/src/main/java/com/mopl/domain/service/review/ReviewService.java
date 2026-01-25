@@ -1,5 +1,6 @@
 package com.mopl.domain.service.review;
 
+import com.mopl.domain.exception.review.ReviewAlreadyExistsException;
 import com.mopl.domain.exception.review.ReviewForbiddenException;
 import com.mopl.domain.exception.review.ReviewNotFoundException;
 import com.mopl.domain.model.content.ContentModel;
@@ -31,6 +32,10 @@ public class ReviewService {
         String text,
         double rating
     ) {
+        if (reviewRepository.existsByContentIdAndAuthorId(content.getId(), author.getId())) {
+            throw ReviewAlreadyExistsException.withContentIdAndAuthorId(content.getId(), author.getId());
+        }
+
         ReviewModel reviewModel = ReviewModel.create(content, author, text, rating);
         ReviewModel savedReviewModel = reviewRepository.save(reviewModel);
 
@@ -51,32 +56,31 @@ public class ReviewService {
 
         double oldRating = review.getRating();
 
-        review.update(text, rating);
-        ReviewModel saved = reviewRepository.save(review);
+        ReviewModel updatedReview = review.update(text, rating);
+        ReviewModel savedReview = reviewRepository.save(updatedReview);
 
-        if (rating != null && rating != oldRating) {
-            ContentModel content = saved.getContent();
+        if (rating != null && Double.compare(rating, oldRating) != 0) {
+            ContentModel content = savedReview.getContent();
             contentRepository.save(content.updateReview(oldRating, rating));
         }
 
-        return saved;
+        return savedReview;
     }
 
-    public UUID delete(UUID reviewId, UUID requesterId) {
+    public UUID deleteAndGetContentId(UUID reviewId, UUID requesterId) {
         ReviewModel review = getById(reviewId);
         validateAuthor(review, requesterId);
 
-        UUID contentId = review.getContent().getId();
+        ContentModel content = review.getContent();
 
         double rating = review.getRating();
 
         review.delete();
         reviewRepository.save(review);
 
-        ContentModel content = review.getContent();
         contentRepository.save(content.removeReview(rating));
 
-        return contentId;
+        return content.getId();
     }
 
     private ReviewModel getById(UUID reviewId) {
