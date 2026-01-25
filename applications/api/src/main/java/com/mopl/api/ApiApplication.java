@@ -8,7 +8,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
     "com.mopl.jpa",
     "com.mopl.redis",
     "com.mopl.cache",
-    "com.mopl.mail"
+    "com.mopl.mail",
+    "com.mopl.search"
 })
 public class ApiApplication {
 

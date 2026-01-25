@@ -17,6 +17,7 @@ spring:
       - jpa.yaml
       - storage.yaml
       - openapi.yaml
+      - search.yaml
 
   threads:
     virtual:
@@ -46,3 +47,9 @@ mopl:
       tsdb:
         defaults:
           sleep-ms: 300
+
+    sync:
+      es:
+        initial-enabled: true
+        defaults:
+          chunk-size: 500

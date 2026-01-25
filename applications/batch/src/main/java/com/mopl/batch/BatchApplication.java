@@ -8,7 +8,8 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
     "com.mopl.batch",
     "com.mopl.jpa",
     "com.mopl.storage",
-    "com.mopl.external"
+    "com.mopl.external",
+    "com.mopl.search"
 })
 @ConfigurationPropertiesScan
 public class BatchApplication {
