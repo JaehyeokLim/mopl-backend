@@ -121,6 +121,25 @@ class ReviewModelTest {
         }
 
         @Test
+        @DisplayName("텍스트가 null이면 예외 발생")
+        void withNullText_throwsException() {
+            // given
+            ContentModel content = mock(ContentModel.class);
+            given(content.getId()).willReturn(UUID.randomUUID());
+            UserModel author = mock(UserModel.class);
+            given(author.getId()).willReturn(UUID.randomUUID());
+
+            // when & then
+            assertThatThrownBy(() -> ReviewModel.create(content, author, null, 1.0))
+                .isInstanceOf(InvalidReviewDataException.class)
+                .satisfies(e -> {
+                    InvalidReviewDataException ex = (InvalidReviewDataException) e;
+                    assertThat((String) ex.getDetails().get("detailMessage"))
+                        .isEqualTo("리뷰 내용은 null일 수 없습니다.");
+                });
+        }
+
+        @Test
         @DisplayName("텍스트 길이가 최대 길이를 초과하면 예외 발생")
         void withTextExceedingMaxLength_throwsException() {
             // given
@@ -318,6 +337,50 @@ class ReviewModelTest {
                     assertThat((String) ex.getDetails().get("detailMessage"))
                         .contains("평점은 0.0 이상 5.0 이하만 가능합니다");
                 });
+        }
+
+        @Test
+        @DisplayName("update()는 원본 객체를 변경하지 않고 새로운 객체를 반환한다 (immutable)")
+        void update_returnsNewObjectWithoutModifyingOriginal() {
+            // given
+            ReviewModel original = ReviewModelFixture.create();
+            String originalText = original.getText();
+            double originalRating = original.getRating();
+
+            String newText = "새로운 텍스트";
+            Double newRating = 1.0;
+
+            // when
+            ReviewModel updated = original.update(newText, newRating);
+
+            // then
+            // 원본은 변경되지 않음
+            assertThat(original.getText()).isEqualTo(originalText);
+            assertThat(original.getRating()).isEqualTo(originalRating);
+
+            // 새 객체에 변경 사항 적용됨
+            assertThat(updated.getText()).isEqualTo(newText);
+            assertThat(updated.getRating()).isEqualTo(newRating);
+
+            // 서로 다른 인스턴스
+            assertThat(updated).isNotSameAs(original);
+
+            // ID는 동일
+            assertThat(updated.getId()).isEqualTo(original.getId());
+        }
+
+        @Test
+        @DisplayName("update()는 content와 author를 유지한다")
+        void update_preservesContentAndAuthor() {
+            // given
+            ReviewModel original = ReviewModelFixture.create();
+
+            // when
+            ReviewModel updated = original.update("새로운 텍스트", 3.0);
+
+            // then
+            assertThat(updated.getContent()).isEqualTo(original.getContent());
+            assertThat(updated.getAuthor()).isEqualTo(original.getAuthor());
         }
     }
 
