@@ -37,6 +37,7 @@ import com.mopl.domain.service.playlist.PlaylistSubscriptionService;
 import com.mopl.domain.service.review.ReviewService;
 import com.mopl.domain.service.user.UserService;
 import com.mopl.domain.service.watchingsession.WatchingSessionService;
+import com.mopl.domain.support.popularity.ContentPopularityPolicyPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
